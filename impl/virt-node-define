@@ -24,6 +24,9 @@ virt-install \
     --accelerate \
     --disk=$VIRT_IMAGE_DIR/${NODE}.${VIRT_IMAGE_TYPE},bus=virtio,format=${VIRT_IMAGE_TYPE},cache=writeback,sparse=true,size=${VIRT_DISK_SIZE} \
     --network=network=$NETWORK,model=virtio \
+    --network=network=$NETWORK,model=virtio \
+    --network=network=$NETWORK,model=virtio \
+    --network=network=$NETWORK,model=virtio \
 
 sleep 3
 
