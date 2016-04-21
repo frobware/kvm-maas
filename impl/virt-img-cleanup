@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -eu
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/common.sh
+
+if virt_domain_is_running $NODE; then
+    virsh destroy $NODE
+fi
+
+if virt_domain_exists $NODE; then
+    virsh undefine $NODE
+fi
+
+vol_path=$(virt_domain_volume_path $VIRT_POOL $NODE)
+
+if [ -n "$vol_path" ]; then
+    virsh pool-refresh default
+    virsh vol-delete --pool $VIRT_POOL $NODE
+fi

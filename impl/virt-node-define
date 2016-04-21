@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -eu
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/common.sh
+
+if virt_domain_exists $NODE; then
+    die "domain $NODE already exists"
+fi
+
+virt-install \
+    --name=$NODE \
+    --connect=${QEMU_URI} \
+    --ram=$VIRT_RAM \
+    --vcpus=$VIRT_CPUS \
+    --hvm \
+    --virt-type=kvm \
+    --pxe \
+    --boot network,hd \
+    --graphics vnc \
+    --noautoconsole \
+    --os-type=linux \
+    --accelerate \
+    --disk=$VIRT_IMAGE_DIR/$NODE,bus=virtio,format=qcow2,cache=none,sparse=true,size=12 \
+    --network=network=$NETWORK,model=virtio \
+
+sleep 3
+
+while :; do
+    node_state=$(virsh domstate $NODE)
+    echo "$NODE: $node_state"
+    if [[ $node_state = "shut off" ]]; then
+	break
+    fi
+    sleep 1.5
+done

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+progname=$(basename $0)
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/impl/common.sh
+
+type -p xmlstarlet > /dev/null || die "please install xmlstarlet(1)"
+type -p python > /dev/null || die "please install python(1)"
+
+if [ $# -lt 2 ]; then
+    echo "usage: $progname <NODE-NAME> <NETWORK-NAME> <MAAS-PROFILE>"
+    exit 1
+fi
+
+export NODE=$1
+export NETWORK=$2
+export MAAS_PROFILE=$3
+
+# This is a sanity check on connecting to the MAAS profile.
+maas $MAAS_PROFILE nodes list >/dev/null || die "cannot list MAAS nodes using profile '$MAAS_PROFILE'"
+
+RUN() {
+    echo "$1"
+    $THISDIR/impl/$2 || die "failed to run $2"
+}
+
+if ! virt_network_exists "$NETWORK"; then
+    die "$NETWORK: unknown virsh network"
+fi
+
+if virt_domain_exists $NODE; then
+    die "domain $NODE already exists"
+fi
+
+set -e
+
+RUN "Cleaning up existing MAAS node" node-cleanup
+RUN "Cleaning up existing disk image" virt-img-cleanup
+RUN "Defining and enlisting QEMU node" virt-node-define
+RUN "Commissioning node in MAAS" node-accept

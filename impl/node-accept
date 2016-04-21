@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -u
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/common.sh
+
+node_state=$(virsh domstate $NODE)
+
+if [ "$node_state" != "shut off" ]; then
+    die "node $NODE must be shut off; currently in state '$node_state'"
+fi
+
+set +e
+
+network_addr=$(virt_network_address $NETWORK)
+
+if [ -z "$network_addr" ]; then
+    die "could not determine IP address for $NETWORK'"
+fi
+
+system_id=$(maas_system_id $MAAS_PROFILE $(virt_domain_ip_address $NODE))
+
+if [ -z "$system_id" ]; then
+    die "could not determine NODE ID from $MAAS_PROFILE"
+fi
+
+set -e
+
+maas $MAAS_PROFILE node update $system_id \
+     power_type=virsh \
+     power_parameters_power_address=qemu+ssh://$USER@$network_addr/system \
+     power_parameters_power_id=$NODE \
+     hostname=$NODE
+
+maas $MAAS_PROFILE nodes accept nodes=$system_id
