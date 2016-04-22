@@ -30,22 +30,15 @@ if conn is None:
 EOF
 
 maas_system_id() {
-    local profile=$1
-    local hwaddr=$2
-    # The trick here is to ensure we don't get conflicting
-    # redirections. 'maas ... | python' tries to tie standard input to
-    # the pipe from the output of maas, while 'python - <<EOF' tries
-    # to tie standard input to the here document. You can't have both.
-    # The here document wins.
-    echo $(maas $profile nodes list | python <(cat <<EOF
+    maas $1 nodes list | python <(cat <<EOF
 import json, sys
 for node in json.load(sys.stdin):
     for mac_info in node['macaddress_set']:
-	if mac_info['mac_address'] == sys.argv[1]:
-	    print(node['system_id'])
-	    exit(0)
+        if mac_info['mac_address'] == sys.argv[2]:
+            print(node['system_id'])
+            exit(0)
 EOF
-) $hwaddr)
+) - $2
 }
 
 virt_network_address() {
@@ -61,7 +54,7 @@ virt_network_exists() {
 $LIBVIRT_PREAMBLE
 for name in conn.listNetworks():
     if name == sys.argv[1]:
-	exit(0)
+        exit(0)
 exit(1)
 EOF
 }
@@ -71,7 +64,7 @@ virt_domain_exists() {
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(0):
     if d.name() == sys.argv[1]:
-	exit(0)
+        exit(0)
 exit(1)
 EOF
 }
@@ -81,7 +74,7 @@ virt_domain_is_running() {
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(libvirt.VIR_CONNECT_LIST_DOMAINS_RUNNING):
     if d.name() == sys.argv[1]:
-	exit(0)
+        exit(0)
 exit(1)
 EOF
 }
@@ -101,8 +94,8 @@ dom_state = (
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(0):
     if d.name() == sys.argv[1]:
-	print(dom_state[d.state()[0]])
-	exit(0)
+        print(dom_state[d.state()[0]])
+        exit(0)
 exit(1)
 EOF
 }
