@@ -7,8 +7,8 @@ source $THISDIR/impl/common.sh
 type -p xmlstarlet > /dev/null || die "please install xmlstarlet(1)"
 type -p python > /dev/null || die "please install python(1)"
 
-if [ $# -lt 2 ]; then
-    echo "usage: $progname <NODE-NAME> <NETWORK-NAME> <MAAS-PROFILE>"
+if [ $# -lt 3 ]; then
+    echo "usage: $progname <NODE-NAME> <VIRT-NETWORK-NAME> <MAAS-PROFILE-NAME>"
     exit 1
 fi
 
@@ -37,4 +37,23 @@ set -e
 RUN "Cleaning up existing MAAS node" node-cleanup
 RUN "Cleaning up existing disk image" virt-img-cleanup
 RUN "Defining and enlisting QEMU node" virt-node-define
+
+duration=$ENLIST_TIMEOUT
+node_state=$(virsh domstate $NODE)
+desired_state="shut off"
+
+while [ $duration -gt 0 ]; do
+    node_state=$(virsh domstate $NODE)
+    if [ "$node_state" = "$desired_state" ]; then
+	break
+    fi
+    echo "$NODE: $node_state"
+    sleep 1
+    duration=$(($duration - 1))
+done
+
+if [ "$node_state" != "$desired_state" ]; then
+    die "$NODE did not reach '$desired_state' state after ${ENLIST_TIMEOUT}s"
+fi
+
 RUN "Commissioning node in MAAS" node-accept

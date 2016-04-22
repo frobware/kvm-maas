@@ -28,13 +28,3 @@ virt-install \
     --network=network=$NETWORK,model=virtio \
     --network=network=$NETWORK,model=virtio \
 
-sleep 3
-
-while :; do
-    node_state=$(virsh domstate $NODE)
-    echo "$NODE: $node_state"
-    if [[ $node_state = "shut off" ]]; then
-	break
-    fi
-    sleep 1.5
-done

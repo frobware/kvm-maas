@@ -9,6 +9,7 @@ set -a
 : ${VIRT_RAM:=4096}
 : ${VIRT_DISK_SIZE:=8}
 : ${TAGS:=}
+: ${ENLIST_TIMEOUT:=240}
 
 set +a
 
