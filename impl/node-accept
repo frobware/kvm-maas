@@ -21,7 +21,7 @@ fi
 system_id=$(maas_system_id $MAAS_PROFILE $(virt_domain_ip_address $NODE))
 
 if [ -z "$system_id" ]; then
-    die "could not system_id for $NODE in $MAAS_PROFILE"
+    die "could not determine system_id for $NODE in $MAAS_PROFILE"
 fi
 
 set -e
