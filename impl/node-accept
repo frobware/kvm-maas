@@ -21,7 +21,7 @@ fi
 system_id=$(maas_system_id $MAAS_PROFILE $(virt_domain_ip_address $NODE))
 
 if [ -z "$system_id" ]; then
-    die "could not determine NODE ID from $MAAS_PROFILE"
+    die "could not system_id for $NODE in $MAAS_PROFILE"
 fi
 
 set -e
@@ -31,5 +31,12 @@ maas $MAAS_PROFILE node update $system_id \
      power_parameters_power_address=qemu+ssh://$USER@$network_addr/system \
      power_parameters_power_id=$NODE \
      hostname=$NODE
+
+if [ -n "$TAGS" ]; then
+    for t in $(echo "$TAGS" | tr ',' '\n'); do
+	maas $MAAS_PROFILE tags new name="$t" || true
+	maas $MAAS_PROFILE tag update-nodes "$t" add=$system_id || true
+    done
+fi
 
 maas $MAAS_PROFILE nodes accept nodes=$system_id

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+progname=$(basename $0)
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/impl/common.sh
+
+if [ $# -lt 2 ]; then
+    echo "usage: $progname <NODE-NAME> <MAAS-PROFILE> [-r] <TAG> [<TAG>...]"
+    exit 1
+fi
+
+export NODE=$1
+export MAAS_PROFILE=$2
+
+shift; shift
+
+tag_op="add"
+
+if [ "$1" = "-r" ]; then
+    tag_op="remove"
+    shift
+fi
+
+set -eu
+
+if ! virt_domain_exists $NODE; then
+    die "$NODE: unknown domain"
+fi
+
+hwaddr=$(virt_domain_ip_address $NODE)
+
+if [ -z "$hwaddr" ]; then
+    die "could not determine mac address for $NODE"
+fi
+
+system_id=$(maas_system_id $MAAS_PROFILE $hwaddr)
+
+for t in "$@"; do
+    if [ "$tag_op" != "delete" ]; then
+	maas $MAAS_PROFILE tags new name="$t" || true
+    fi
+    maas $MAAS_PROFILE tag update-nodes "$t" $tag_op=$system_id
+done

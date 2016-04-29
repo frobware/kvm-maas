@@ -8,6 +8,7 @@ set -a
 : ${VIRT_CPUS:=2}
 : ${VIRT_RAM:=4096}
 : ${VIRT_DISK_SIZE:=8}
+: ${TAGS:=}
 
 set +a
 
