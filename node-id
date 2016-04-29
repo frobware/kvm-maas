@@ -1,0 +1,27 @@
+#!/bin/bash
+
+progname=$(basename $0)
+THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
+source $THISDIR/impl/common.sh
+
+if [ $# -ne 2 ]; then
+    echo "usage: $progname <NODE-NAME> <MAAS-PROFILE>"
+    exit 1
+fi
+
+export NODE=$1
+export MAAS_PROFILE=$2
+
+set -eu
+
+if ! virt_domain_exists $NODE; then
+    die "$NODE: unknown domain"
+fi
+
+hwaddr=$(virt_domain_ip_address $NODE)
+
+if [ -z "$hwaddr" ]; then
+    die "could not determine mac address for $NODE"
+fi
+
+maas_system_id $MAAS_PROFILE $hwaddr
