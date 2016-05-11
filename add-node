@@ -5,7 +5,7 @@ THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
 source $THISDIR/impl/common.sh
 
 type -p xmlstarlet > /dev/null || die "please install xmlstarlet(1)"
-type -p python > /dev/null || die "please install python(1)"
+type -p python2 > /dev/null || die "please install python2(1)"
 
 if [ $# -lt 3 ]; then
     echo "usage: $progname <NODE-NAME> <VIRT-NETWORK-NAME> <MAAS-PROFILE-NAME>"

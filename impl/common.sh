@@ -31,7 +31,7 @@ if conn is None:
 EOF
 
 maas_system_id() {
-    maas $1 nodes list | python <(cat <<EOF
+    maas $1 nodes list | python2 <(cat <<EOF
 import json, sys
 for node in json.load(sys.stdin):
     for mac_info in node['macaddress_set']:
@@ -51,7 +51,7 @@ virt_domain_ip_address() {
 }
 
 virt_network_exists() {
-    python - $1 <<EOF
+    python2 - $1 <<EOF
 $LIBVIRT_PREAMBLE
 for name in conn.listNetworks():
     if name == sys.argv[1]:
@@ -61,7 +61,7 @@ EOF
 }
 
 virt_domain_exists() {
-    python - $1 <<EOF
+    python2 - $1 <<EOF
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(0):
     if d.name() == sys.argv[1]:
@@ -71,7 +71,7 @@ EOF
 }
 
 virt_domain_is_running() {
-    python - $1 <<EOF
+    python2 - $1 <<EOF
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(libvirt.VIR_CONNECT_LIST_DOMAINS_RUNNING):
     if d.name() == sys.argv[1]:
@@ -81,7 +81,7 @@ EOF
 }
 
 virt_domain_state() {
-    python - $1 <<EOF
+    python2 - $1 <<EOF
 dom_state = (
     "nostate",
     "running",
@@ -102,7 +102,7 @@ EOF
 }
 
 virt_domain_volume_path() {
-    python - $1 $2 <<EOF
+    python2 - $1 $2 <<EOF
 $LIBVIRT_PREAMBLE
 for pool in conn.listAllStoragePools(0):
     if pool.name() == sys.argv[1]:
