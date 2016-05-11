@@ -5,8 +5,8 @@ set -a
 : ${MAAS_PROFILE:=undefined}
 : ${VIRT_POOL:=default}
 : ${VIRT_IMAGE_DIR:=/var/lib/libvirt/images}
-: ${VIRT_CPUS:=2}
-: ${VIRT_RAM:=4096}
+: ${VIRT_CPUS:=1}
+: ${VIRT_RAM:=1024}
 : ${VIRT_DISK_SIZE:=8}
 : ${TAGS:=}
 : ${ENLIST_TIMEOUT:=240}
