@@ -15,7 +15,6 @@ virt-install \
     --vcpus=$VIRT_CPUS \
     --hvm \
     --virt-type=kvm \
-    --pxe \
     --boot network,hd \
     --graphics vnc \
     --noautoconsole \
