@@ -7,7 +7,7 @@ set -a
 : ${VIRT_IMAGE_DIR:=/var/lib/libvirt/images}
 : ${VIRT_CPUS:=1}
 : ${VIRT_RAM:=1024}
-: ${VIRT_DISK_SIZE:=8}
+: ${VIRT_DISK_SIZE:=16}
 : ${TAGS:=}
 : ${ENLIST_TIMEOUT:=240}
 
