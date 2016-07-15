@@ -17,7 +17,7 @@ export NETWORK=$2
 export MAAS_PROFILE=$3
 
 # This is a sanity check on connecting to the MAAS profile.
-maas $MAAS_PROFILE nodes list >/dev/null || die "cannot list MAAS nodes using profile '$MAAS_PROFILE'"
+maas $MAAS_PROFILE nodes list >/dev/null 2>&1 || die "cannot list MAAS nodes using profile '$MAAS_PROFILE'"
 
 RUN() {
     echo "$1"
