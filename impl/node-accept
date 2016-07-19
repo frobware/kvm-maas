@@ -26,7 +26,17 @@ fi
 
 set -e
 
-maas $MAAS_PROFILE node update $system_id \
+maas_version=$(maas_version $MAAS_PROFILE)
+
+if [ "$maas_version" = "1" ]; then
+    power="node"
+    accept="nodes"
+else
+    power="machine"
+    accept="machines"
+fi
+
+maas $MAAS_PROFILE $power update $system_id \
      power_type=virsh \
      power_parameters_power_address=qemu+ssh://$USER@$network_addr/system \
      power_parameters_power_id=$NODE \
@@ -39,4 +49,4 @@ if [ -n "$TAGS" ]; then
     done
 fi
 
-maas $MAAS_PROFILE nodes accept nodes=$system_id
+maas $MAAS_PROFILE $accept accept $accept=$system_id
