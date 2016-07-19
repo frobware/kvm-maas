@@ -44,13 +44,24 @@ EOF
 }
 
 maas_system_id() {
-    maas $1 nodes list | python2 <(cat <<EOF
+    local version=$(maas_version $1)
+    local op="list"
+    case $version in
+	2*) op="read";;
+    esac
+    maas $1 nodes $op | python2 <(cat <<EOF
 import json, sys
 for node in json.load(sys.stdin):
-    for mac_info in node['macaddress_set']:
-        if mac_info['mac_address'] == sys.argv[2]:
-            print(node['system_id'])
-            exit(0)
+    if 'macaddress_set' in node:
+        for mac_info in node['macaddress_set']:
+            if mac_info['mac_address'] == sys.argv[2]:
+                print(node['system_id'])
+                exit(0)
+    if 'interface_set' in node:
+        for mac_info in node['interface_set']:
+            if mac_info['mac_address'] == sys.argv[2]:
+                print(node['system_id'])
+                exit(0)
 EOF
 ) - $2
 }
