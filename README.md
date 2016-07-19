@@ -7,3 +7,5 @@ named `maas-net` you can add and remove nodes as follows:
 $ ./add-node node1 maas-net maas
 $ ./remove-node node1 maas-net maas
 ```
+
+These commands will work for MAAS 1.9 and 2.0.
