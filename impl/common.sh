@@ -30,6 +30,19 @@ if conn is None:
     exit(1)
 EOF
 
+maas_version() {
+    maas $1 version read | python2 <(cat <<EOF
+import json, sys
+result = json.load(sys.stdin)
+if 'version' in result:
+    if result['version'].startswith("2"):
+        print("2")
+    else:
+        print("1")
+EOF
+) -
+}
+
 maas_system_id() {
     maas $1 nodes list | python2 <(cat <<EOF
 import json, sys
