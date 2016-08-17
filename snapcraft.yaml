@@ -11,7 +11,7 @@ apps:
   remove-node:
     command: remove-node
     plugs: [home network]
-    
+
 parts:
   local-files:
     source: .
