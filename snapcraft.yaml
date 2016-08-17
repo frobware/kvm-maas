@@ -1,0 +1,51 @@
+name: kvm-maas
+version: 0.1
+summary: Register and commission KVM nodes in MAAS
+description: Register and commission KVM nodes in MAAS
+confinement: devmode
+
+apps:
+  add-node:
+    command: add-node
+    plugs: [home network]
+  remove-node:
+    command: remove-node
+    plugs: [home network]
+    
+parts:
+  local-files:
+    source: .
+    source-type: dir
+    plugin: dump
+  maasclidb:
+    plugin: copy
+    source: .
+    files:
+      maascli.db: .maascli.db
+  libvirt-bin:
+    plugin: nil
+    stage-packages:
+      - libvirt-bin
+  xmlstarlet:
+    plugin: nil
+    stage-packages:
+      - xmlstarlet
+    filesets:
+      xmlstarlet:
+        - usr/bin/xmlstarlet
+    stage:
+      - $xmlstarlet
+    snap:
+      - $xmlstarlet
+  python-libvirt:
+    plugin: nil
+    stage-packages:
+      - python-libvirt
+  maas-cli:
+    plugin: nil
+    stage-packages:
+      - maas-cli
+  python3-maas-client:
+    plugin: nil
+    stage-packages:
+      - python3-maas-client

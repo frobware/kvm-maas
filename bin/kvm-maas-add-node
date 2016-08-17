@@ -2,7 +2,7 @@
 
 progname=$(basename $0)
 THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
-source $THISDIR/impl/common.sh
+source $THISDIR/../libexec/kvm-maas/common.sh
 
 type -p xmlstarlet > /dev/null || die "please install xmlstarlet(1)"
 type -p python2 > /dev/null || die "please install python2(1)"
@@ -21,7 +21,7 @@ maas $MAAS_PROFILE version read >/dev/null 2>&1 || die "MAAS verification failed
 
 RUN() {
     echo "$1"
-    $THISDIR/impl/$2 || die "failed to run $2"
+    $THISDIR/../libexec/kvm-maas/$2 || die "failed to run $2"
 }
 
 if ! virt_network_exists "$NETWORK"; then

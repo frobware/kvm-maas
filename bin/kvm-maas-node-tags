@@ -2,7 +2,7 @@
 
 progname=$(basename $0)
 THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
-source $THISDIR/impl/common.sh
+source $THISDIR/../libexec/kvm-maas/common.sh
 
 if [ $# -lt 2 ]; then
     echo "usage: $progname <NODE-NAME> <MAAS-PROFILE> [-r] <TAG> [<TAG>...]"
