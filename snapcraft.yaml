@@ -6,10 +6,10 @@ confinement: devmode
 
 apps:
   add-node:
-    command: add-node
+    command: bin/kvm-maas-add-node
     plugs: [home network]
   remove-node:
-    command: remove-node
+    command: bin/kvm-maas-remove-node
     plugs: [home network]
 
 parts:
@@ -41,6 +41,10 @@ parts:
     plugin: nil
     stage-packages:
       - python-libvirt
+  virt-install:
+    plugin: nil
+    stage-packages:
+      - virtinst
   maas-cli:
     plugin: nil
     stage-packages:
