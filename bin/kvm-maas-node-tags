@@ -35,9 +35,16 @@ fi
 
 system_id=$(maas_system_id $MAAS_PROFILE $hwaddr)
 
+version=$(maas_version $MAAS_PROFILE)
+op="new"
+
+case $version in
+    2*) op="create";;
+esac
+
 for t in "$@"; do
     if [ "$tag_op" != "delete" ]; then
-	maas $MAAS_PROFILE tags new name="$t" || true
+	maas $MAAS_PROFILE tags $op name="$t" || true
     fi
     maas $MAAS_PROFILE tag update-nodes "$t" $tag_op=$system_id
 done
