@@ -13,5 +13,4 @@ dist_pkglibexec_SCRIPTS =			\
 	libexec/kvm-maas/node-accept		\
 	libexec/kvm-maas/node-cleanup		\
 	libexec/kvm-maas/virt-img-cleanup	\
-	libexec/kvm-maas/virt-img-create	\
 	libexec/kvm-maas/virt-node-define
