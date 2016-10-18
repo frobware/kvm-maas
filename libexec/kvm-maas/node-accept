@@ -12,10 +12,10 @@ fi
 
 set +e
 
-pxe_network_addr=$(virt_network_address $NETWORKS[0])
+pxe_network_addr=$(virt_network_address ${NETWORKS[0]})
 
 if [ -z "$pxe_network_addr" ]; then
-    die "could not determine IP address for PXE network $NETWORKS[0]'"
+    die "could not determine IP address for PXE network ${NETWORKS[0]}'"
 fi
 
 system_id=$(maas_system_id $MAAS_PROFILE $(virt_domain_ip_address $NODE))
