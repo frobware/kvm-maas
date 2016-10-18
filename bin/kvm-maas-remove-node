@@ -8,22 +8,25 @@ type -p xmlstarlet > /dev/null || die "please install xmlstarlet(1)"
 type -p python2 > /dev/null || die "please install python2(1)"
 
 if [ $# -lt 3 ]; then
-    echo "usage: $progname <NODE-NAME> <VIRT-NETWORK-NAME> <MAAS-PROFILE-NAME>"
+    echo "usage: $progname <NODE-NAME> <MAAS-PROFILE-NAME> <PXE-VIRT-NETWORK-NAME-1> [<EXTRA-NETWORK-NAME-2>...]"
     exit 1
 fi
 
 export NODE=$1
-export NETWORK=$2
-export MAAS_PROFILE=$3
+export MAAS_PROFILE=$2
+shift 2
+export NETWORKS="$@"
 
 RUN() {
     echo "$1"
     $THISDIR/../libexec/kvm-maas/$2 || die "failed to run $2"
 }
 
-if ! virt_network_exists "$NETWORK"; then
-    die "$NETWORK: unknown virsh network"
-fi
+for net in ${NETWORKS[@]}; do
+    if ! virt_network_exists "$net"; then
+        die "$net: unknown virsh network"
+    fi
+done
 
 set -e
 
