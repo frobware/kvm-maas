@@ -10,7 +10,7 @@ fi
 
 networks_args=""
 for net in ${NETWORKS[@]}; do
-    networks_args="--network=network=$net,model=virtio $networks_args"
+    networks_args+="--network=network=$net,model=virtio"
 done
 
 virt-install \
