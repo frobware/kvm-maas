@@ -31,7 +31,8 @@ if conn is None:
 EOF
 
 maas_version() {
-    maas $1 version read | python2 <(cat <<EOF
+    local profile=$1
+    maas $profile version read | python2 <(cat <<EOF
 import json, sys
 result = json.load(sys.stdin)
 if 'version' in result:
@@ -44,12 +45,13 @@ EOF
 }
 
 maas_system_id() {
-    local version=$(maas_version $1)
+    local profile=$1
+    local version=$(maas_version $profile)
     local op="list"
     case $version in
 	2*) op="read";;
     esac
-    maas $1 nodes $op | python2 <(cat <<EOF
+    maas $profile nodes $op | python2 <(cat <<EOF
 import json, sys
 for node in json.load(sys.stdin):
     if 'macaddress_set' in node:
@@ -67,15 +69,18 @@ EOF
 }
 
 virt_network_address() {
-    echo $(virsh net-dumpxml $1 | xmlstarlet sel -t -v '//network/ip/@address')
+    local network=$1
+    echo $(virsh net-dumpxml $network | xmlstarlet sel -t -v '//network/ip/@address')
 }
 
 virt_domain_ip_address() {
-    echo $(virsh dumpxml $1 | xmlstarlet sel -t -v '//interface/mac/@address' | head -n1)
+    local domain=$1
+    echo $(virsh dumpxml $domain | xmlstarlet sel -t -v '//interface/mac/@address' | head -n1)
 }
 
 virt_network_exists() {
-    python2 - $1 <<EOF
+    local network=$1
+    python2 - $network <<EOF
 $LIBVIRT_PREAMBLE
 for name in conn.listNetworks():
     if name == sys.argv[1]:
@@ -85,7 +90,8 @@ EOF
 }
 
 virt_domain_exists() {
-    python2 - $1 <<EOF
+    local domain=$1
+    python2 - $domain <<EOF
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(0):
     if d.name() == sys.argv[1]:
@@ -95,7 +101,8 @@ EOF
 }
 
 virt_domain_is_running() {
-    python2 - $1 <<EOF
+    local domain=$1
+    python2 - $domain <<EOF
 $LIBVIRT_PREAMBLE
 for d in conn.listAllDomains(libvirt.VIR_CONNECT_LIST_DOMAINS_RUNNING):
     if d.name() == sys.argv[1]:
@@ -105,7 +112,8 @@ EOF
 }
 
 virt_domain_state() {
-    python2 - $1 <<EOF
+    local domain=$1
+    python2 - $domain <<EOF
 dom_state = (
     "nostate",
     "running",
@@ -126,7 +134,9 @@ EOF
 }
 
 virt_domain_volume_path() {
-    python2 - $1 $2 <<EOF
+    local pool=$1
+    local volume=$2
+    python2 - $pool $volume <<EOF
 $LIBVIRT_PREAMBLE
 for pool in conn.listAllStoragePools(0):
     if pool.name() == sys.argv[1]:

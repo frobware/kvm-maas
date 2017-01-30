@@ -8,6 +8,11 @@ if virt_domain_exists $NODE; then
     die "domain $NODE already exists"
 fi
 
+networks_args=""
+for net in ${NETWORKS[@]}; do
+    networks_args="--network=network=$net,model=virtio $networks_args"
+done
+
 virt-install \
     --name=$NODE \
     --connect=${QEMU_URI} \
@@ -22,8 +27,5 @@ virt-install \
     --os-variant=generic \
     --accelerate \
     --disk=$VIRT_IMAGE_DIR/${NODE}.${VIRT_IMAGE_TYPE},bus=virtio,format=${VIRT_IMAGE_TYPE},cache=writeback,sparse=true,size=${VIRT_DISK_SIZE} \
-    --network=network=$NETWORK,model=virtio \
-    --network=network=${NETWORK2:-$NETWORK},model=virtio \
-    --network=network=${NETWORK3:-$NETWORK},model=virtio \
-    --network=network=${NETWORK4:-$NETWORK},model=virtio \
+    $networks_args
 

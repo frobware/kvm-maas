@@ -12,9 +12,12 @@ if virt_domain_exists $NODE; then
     virsh undefine $NODE
 fi
 
-vol_path=$(virt_domain_volume_path $VIRT_POOL $NODE)
+vol_with_type="${NODE}.${VIRT_IMAGE_TYPE}"
+vol_path=$(virt_domain_volume_path $VIRT_POOL $vol_with_type)
 
 if [ -n "$vol_path" ]; then
     virsh pool-refresh default
-    virsh vol-delete --pool $VIRT_POOL $NODE
+    virsh vol-delete --pool $VIRT_POOL $vol_with_type
+else
+    echo "No image $vol_with_type to clean."
 fi

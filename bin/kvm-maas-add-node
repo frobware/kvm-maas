@@ -5,13 +5,14 @@ THISDIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd -P)"
 source $THISDIR/../libexec/kvm-maas/common.sh
 
 if [ $# -lt 3 ]; then
-    echo "usage: $progname <NODE-NAME> <VIRT-NETWORK-NAME> <MAAS-PROFILE-NAME>"
+    echo "usage: $progname <NODE-NAME> <MAAS-PROFILE-NAME> <PXE-VIRT-NETWORK-NAME-1> [<EXTRA-VIRT-NETWORK-NAME-2>...]"
     exit 1
 fi
 
 export NODE=$1
-export NETWORK=$2
-export MAAS_PROFILE=$3
+export MAAS_PROFILE=$2
+shift 2
+export NETWORKS="$@"
 
 # This is a sanity check on connecting to the MAAS profile.
 maas $MAAS_PROFILE version read >/dev/null 2>&1 || die "MAAS verification failed using profile '$MAAS_PROFILE'"
@@ -21,9 +22,12 @@ RUN() {
     $THISDIR/../libexec/kvm-maas/$2 || die "failed to run $2"
 }
 
-if ! virt_network_exists "$NETWORK"; then
-    die "$NETWORK: unknown virsh network"
-fi
+networks_args=""
+for net in ${NETWORKS[@]}; do
+    if ! virt_network_exists "$net"; then
+        die "$net: unknown virsh network"
+    fi
+done
 
 if virt_domain_exists $NODE; then
     die "domain $NODE already exists"
